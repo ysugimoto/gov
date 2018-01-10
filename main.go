@@ -133,7 +133,7 @@ func setup() {
 }
 
 func main() {
-	ctx := args.New().Alias("m", "message", "").Parse(os.Args[1:])
+	ctx := args.New().Alias("message", "m", "").Parse(os.Args[1:])
 	subCommand := ctx.At(0)
 	if subCommand == "init" {
 		pwd, _ := os.Getwd()
