@@ -115,11 +115,12 @@ func setup() {
 	pwd, _ := os.Getwd()
 	versionFile = findup(pwd)
 	if _, err := os.Stat(versionFile); err != nil {
-		fmt.Println(err)
+		fmt.Println("Couldn't find version file.")
 		os.Exit(1)
 	}
 	buf, err := ioutil.ReadFile(versionFile)
 	if err != nil {
+		fmt.Println("Couln't read Version file. Check file permission.")
 		fmt.Println(err)
 		os.Exit(1)
 	}
