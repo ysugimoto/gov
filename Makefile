@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	go build
+	go build -ldflags "-X main.appVersion=$(shell gov)"

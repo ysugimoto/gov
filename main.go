@@ -12,6 +12,10 @@ import (
 	"github.com/ysugimoto/go-args"
 )
 
+// Application version
+// This will be embedded on build phase
+var appVersion = "latest"
+
 // Section split regex. Format is:
 
 // ```
@@ -81,6 +85,8 @@ func main() {
 	ctx := args.New().Alias("message", "m", "").Parse(os.Args[1:])
 
 	switch ctx.At(0) {
+	case "version":
+		fmt.Println(appVersion)
 	case "init":
 		pwd, _ := os.Getwd()
 		versionFile = findup(pwd)
