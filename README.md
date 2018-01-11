@@ -1,7 +1,7 @@
 # gov
 Golang versioning tool
 
-## Installtion
+## Installation
 
 ```
 $ go get -u github.com/ysugimoto/gov
@@ -19,18 +19,19 @@ After that, you can use `gov` command.
 $ gov init
 ```
 
+After that, you can find `.versions` file at current workind directory (as project root).
+
 ### Show current version
 
 ```
 $ gov
 ```
 
-`gov` command will find up `.versions` file and use it. So you can run `gov` on sub-directory.
+`gov` command will find up `.versions` file and use it. So you can run `gov` on sub directories.
 
 ## Bump versions
 
-Bump versions. Once you execute  following commands, the `gov` will make new commit and version tag.
-Make sure you are `master` branch.
+Bump versions. Once you execute  following commands, the `gov` will make new commit and version tag. Make sure you are `master` branch.
 
 ### patch
 
@@ -55,7 +56,8 @@ $ gov major
 >> v1.0.0
 ```
 
-After that, you can push to remote:
+After that, you can push to remote with new commit and tag:
+
 ```
 $ git push --folow-tags
 ```
