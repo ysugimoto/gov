@@ -5,7 +5,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strings"
 
 	"io/ioutil"
 	"path/filepath"
@@ -13,10 +12,19 @@ import (
 	"github.com/ysugimoto/go-args"
 )
 
-var sectionRegex = regexp.MustCompile("\\[v?([0-9]+)\\.?([0-9]+)?\\.?([0-9]+)?\\]([^\\[]+)")
+// Section split regex. Format is:
+
+// ```
+// [(major).(minor).(patch)]
+// (description...)
+//
+// ---
+// ...
+var sectionRegex = regexp.MustCompile("\\[v?([0-9]+)\\.?([0-9]+)?\\.?([0-9]+)?\\]([^\\-]{4})")
 var vs Versions
 var versionFile string
 
+// Find .versions file up to root
 func findup(dir string) (path string) {
 	for {
 		path = filepath.Join(dir, ".versions")
@@ -30,19 +38,17 @@ func findup(dir string) (path string) {
 	return
 }
 
-func setup() {
+// Read version file and make structs
+func setup() error {
 	vs = Versions{}
 	pwd, _ := os.Getwd()
 	versionFile = findup(pwd)
 	if _, err := os.Stat(versionFile); err != nil {
-		fmt.Println("Couldn't find version file.")
-		os.Exit(1)
+		return fmt.Errorf("Couldn't find version file.")
 	}
 	buf, err := ioutil.ReadFile(versionFile)
 	if err != nil {
-		fmt.Println("Couln't read Version file. Check file permission.")
-		fmt.Println(err)
-		os.Exit(1)
+		return fmt.Errorf("Couln't read Version file. Check file permission.")
 	}
 	ret := sectionRegex.FindAllStringSubmatch(string(buf), -1)
 	for _, v := range ret {
@@ -50,12 +56,27 @@ func setup() {
 		vs = append(vs, version)
 	}
 	sort.Sort(vs)
+	if len(vs) == 0 {
+		vs = append(vs, Version{})
+	}
+	return nil
 }
 
+// Main
 func main() {
+	var newVersion Version
+	var err error
+
+	defer func() {
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	ctx := args.New().Alias("message", "m", "").Parse(os.Args[1:])
-	subCommand := ctx.At(0)
-	if subCommand == "init" {
+
+	switch ctx.At(0) {
+	case "init":
 		pwd, _ := os.Getwd()
 		versionFile = findup(pwd)
 		if versionFile != "" {
@@ -66,50 +87,54 @@ func main() {
 		defer file.Close()
 		file.WriteString("[0.0.1]\nFirst Version\n")
 		fmt.Println("Version file created successfully!")
-		os.Exit(0)
-	}
-	setup()
-	if len(vs) == 0 {
-		fmt.Println("Couldn't find any versions at versions file.")
-		os.Exit(1)
-	}
-	latest := vs[0]
-	if ctx.Len() == 0 {
-		fmt.Println(latest.VersionString())
-		os.Exit(0)
-	}
-
-	var newVersion Version
-	switch ctx.At(0) {
 	case "patch":
-		newVersion = latest.BumpPatch(ctx.String("message"))
-		writeVersion(newVersion)
-		fmt.Println(newVersion.VersionString())
+		if err = setup(); err != nil {
+			return
+		}
+		newVersion = vs[0].BumpPatch(ctx.String("message"))
+		if err = writeVersion(newVersion); err == nil {
+			fmt.Println(newVersion.VersionString())
+		}
 	case "minor":
-		newVersion = latest.BumpMinor(ctx.String("message"))
+		if err = setup(); err != nil {
+			return
+		}
+		newVersion = vs[0].BumpMinor(ctx.String("message"))
+		if err = writeVersion(newVersion); err == nil {
+			fmt.Println(newVersion.VersionString())
+		}
 		writeVersion(newVersion)
 		fmt.Println(newVersion.VersionString())
 	case "major":
-		newVersion = latest.BumpMajor(ctx.String("message"))
-		writeVersion(newVersion)
-		fmt.Println(newVersion.VersionString())
+		if err = setup(); err != nil {
+			return
+		}
+		newVersion = vs[0].BumpMajor(ctx.String("message"))
+		if err = writeVersion(newVersion); err == nil {
+			fmt.Println(newVersion.VersionString())
+		}
 	default:
-		fmt.Println(latest.VersionString())
+		if err = setup(); err != nil {
+			return
+		}
+		fmt.Println(vs[0].VersionString())
 	}
 }
 
-func writeVersion(newVersion Version) {
+// Write new version
+func writeVersion(newVersion Version) error {
 	versions := Versions{newVersion}
 	versions = append(versions, vs...)
-	out := []string{}
-	for _, v := range versions {
-		out = append(out, v.String())
+	fp, _ := os.OpenFile(versionFile, os.O_RDWR, 0755)
+	defer fp.Close()
+	for i, v := range versions {
+		fp.WriteString(v.String())
+		if i != len(versions)-1 {
+			fp.WriteString("----\n\n")
+		}
 	}
-	if err := ioutil.WriteFile(versionFile, []byte(strings.Join(out, "\n")), 0666); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	} else if err := git(newVersion); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if err := git(newVersion); err != nil {
+		return err
 	}
+	return nil
 }

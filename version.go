@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// Version section struct
+// The version will follow semver.
 type Version struct {
 	major   int
 	minor   int
@@ -13,6 +15,7 @@ type Version struct {
 	message string
 }
 
+// Export as string
 func (v Version) String() string {
 	var m string
 	if v.message != "" {
@@ -20,9 +23,13 @@ func (v Version) String() string {
 	}
 	return fmt.Sprintf("[%d.%d.%d]%s\n", v.major, v.minor, v.patch, m)
 }
+
+// Format version string like v1.0.0
 func (v Version) VersionString() string {
 	return fmt.Sprintf("v%d.%d.%d", v.major, v.minor, v.patch)
 }
+
+// Bump patch version and create new version
 func (v Version) BumpPatch(msg string) Version {
 	return Version{
 		major:   v.major,
@@ -31,6 +38,8 @@ func (v Version) BumpPatch(msg string) Version {
 		message: msg,
 	}
 }
+
+// Bump minor version and create new version
 func (v Version) BumpMinor(msg string) Version {
 	return Version{
 		major:   v.major,
@@ -38,6 +47,8 @@ func (v Version) BumpMinor(msg string) Version {
 		message: msg,
 	}
 }
+
+// Bump major version and create new version
 func (v Version) BumpMajor(msg string) Version {
 	return Version{
 		major:   v.major + 1,
@@ -45,6 +56,7 @@ func (v Version) BumpMajor(msg string) Version {
 	}
 }
 
+// Create version struct from parsed string
 func createVersion(major, minor, patch, message string) Version {
 	_major, _ := strconv.Atoi(major)
 	_minor, _ := strconv.Atoi(minor)
@@ -57,6 +69,7 @@ func createVersion(major, minor, patch, message string) Version {
 	}
 }
 
+// Version slice type to define sort interface
 type Versions []Version
 
 func (v Versions) Len() int {
@@ -74,11 +87,13 @@ func (v Versions) Less(i, j int) bool {
 	} else if v[i].minor > v[j].minor {
 		return true
 	}
+
 	if v[i].patch < v[j].patch {
 		return false
 	} else if v[i].patch > v[j].patch {
 		return true
 	}
+
 	return false
 }
 func (v Versions) Swap(i, j int) {
