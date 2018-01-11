@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
 	"os/exec"
 )
@@ -11,10 +10,10 @@ import (
 // Execute git commands
 func git(version Version) error {
 	// Confirm you are in master branch
-	branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 	if err != nil {
 		return fmt.Errorf("[Git] Finding branch error")
-	} else if branch != "master" {
+	} else if string(branch) != "master" {
 		return fmt.Errorf("[Git] You aren't master branch. You need to checkout master branch")
 	}
 	// Confirm commit target files
@@ -26,7 +25,7 @@ func git(version Version) error {
 	// If commit files isn't only .versions file, abort process
 	files := bytes.Split(bytes.Trim(status, "\r\n"), []byte("\n"))
 	if len(files) != 1 {
-		return fmt.Errorf("[Git] Uncommitted file found. Please stash or remove.\n%s", string.Join(files, "\n"))
+		return fmt.Errorf("[Git] Uncommitted file found. Please stash or remove.\n%s", string(bytes.Join(files, []byte("\n"))))
 	} else if !bytes.HasSuffix(files[0], []byte(".versions")) {
 		return fmt.Errorf("[Git] Counldn't find .versions file in commit files")
 	}
