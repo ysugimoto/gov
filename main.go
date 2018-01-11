@@ -20,7 +20,7 @@ import (
 //
 // ---
 // ...
-var sectionRegex = regexp.MustCompile("\\[v?([0-9]+)\\.?([0-9]+)?\\.?([0-9]+)?\\]([^\\-]{4})")
+var sectionRegex = regexp.MustCompile("\\[v?([0-9]+)\\.?([0-9]+)?\\.?([0-9]+)?\\]([^\\-\\-\\-\\-]+)")
 var vs Versions
 var versionFile string
 
@@ -40,7 +40,6 @@ func findup(dir string) (path string) {
 
 // Read version file and make structs
 func setup() error {
-	vs = Versions{}
 	pwd, _ := os.Getwd()
 	versionFile = findup(pwd)
 	if _, err := os.Stat(versionFile); err != nil {
@@ -50,16 +49,22 @@ func setup() error {
 	if err != nil {
 		return fmt.Errorf("Couln't read Version file. Check file permission.")
 	}
-	ret := sectionRegex.FindAllStringSubmatch(string(buf), -1)
+	vs = parseVersion(string(buf))
+	sort.Sort(vs)
+	return nil
+}
+
+func parseVersion(str string) Versions {
+	versions := Versions{}
+	ret := sectionRegex.FindAllStringSubmatch(str, -1)
 	for _, v := range ret {
 		version := createVersion(v[1], v[2], v[3], v[4])
-		vs = append(vs, version)
+		versions = append(versions, version)
 	}
-	sort.Sort(vs)
-	if len(vs) == 0 {
-		vs = append(vs, Version{})
+	if len(versions) == 0 {
+		versions = append(versions, Version{})
 	}
-	return nil
+	return versions
 }
 
 // Main

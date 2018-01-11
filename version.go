@@ -17,11 +17,11 @@ type Version struct {
 
 // Export as string
 func (v Version) String() string {
-	var m string
+	m := "\n"
 	if v.message != "" {
-		m = "\n" + v.message
+		m = v.message
 	}
-	return fmt.Sprintf("[%d.%d.%d]%s\n", v.major, v.minor, v.patch, m)
+	return fmt.Sprintf("[%d.%d.%d]\n%s", v.major, v.minor, v.patch, m)
 }
 
 // Format version string like v1.0.0
