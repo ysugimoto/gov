@@ -31,7 +31,7 @@ func git(version Version) error {
 		return err
 	}
 	// Make tag
-	tag := exec.Command("git", "tag", "-a", vs)
+	tag := exec.Command("git", "tag", "-a", vs, "-m", "")
 	if err := tag.Run(); err != nil {
 		fmt.Println("git tag error")
 		return err
