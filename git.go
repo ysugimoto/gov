@@ -13,7 +13,7 @@ func git(version Version) error {
 	branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 	if err != nil {
 		return fmt.Errorf("[Git] Finding branch error")
-	} else if string(branch) != "master" {
+	} else if string(bytes.TrimRight(branch, "\r\n")) != "master" {
 		return fmt.Errorf("[Git] You aren't master branch. You need to checkout master branch")
 	}
 	// Confirm commit target files
