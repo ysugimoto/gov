@@ -128,6 +128,9 @@ func main() {
 
 // Write new version
 func writeVersion(newVersion Version) error {
+	if err := git(newVersion); err != nil {
+		return err
+	}
 	versions := Versions{newVersion}
 	versions = append(versions, vs...)
 	fp, _ := os.OpenFile(versionFile, os.O_RDWR, 0755)
@@ -137,9 +140,6 @@ func writeVersion(newVersion Version) error {
 		if i != len(versions)-1 {
 			fp.WriteString("----\n\n")
 		}
-	}
-	if err := git(newVersion); err != nil {
-		return err
 	}
 	return nil
 }
