@@ -4,7 +4,7 @@ Golang versioning tool
 ## Installation
 
 ```
-$ go get -u github.com/ysugimoto/gov
+$ go get -u github.com/ysugimoto/gov...
 ```
 
 After that, you can use `gov` command.
