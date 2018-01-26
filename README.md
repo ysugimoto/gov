@@ -7,7 +7,7 @@ Golang versioning tool
 $ go get -u github.com/ysugimoto/gov...
 ```
 
-After that, you can use `gov` command.
+You can use `gov` command.
 
 ## Setup
 
@@ -19,7 +19,7 @@ After that, you can use `gov` command.
 $ gov init
 ```
 
-After that, you can find `.versions` file at current workind directory (as project root).
+This command create `.versions` file at current working directory (as project root).
 
 ### Show current version
 
@@ -31,7 +31,8 @@ $ gov
 
 ## Bump versions
 
-Bump versions. Once you execute  following commands, the `gov` will make new commit and version tag. Make sure you are `master` branch.
+Once you execute following commands, the `gov` will make new commit and version tag.
+Note that versioning should do on `master` branch, `gov` command makes sure you are in `master` branch.
 
 ### patch
 

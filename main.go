@@ -58,6 +58,7 @@ func setup() error {
 	return nil
 }
 
+// Parse version string
 func parseVersion(str string) Versions {
 	versions := Versions{}
 	ret := sectionRegex.FindAllStringSubmatch(str, -1)
@@ -71,6 +72,21 @@ func parseVersion(str string) Versions {
 	return versions
 }
 
+func showUsage() {
+	help := `Usage:
+  $ gov [patch|minor|major] [-mh]
+
+Sub commands:
+  patch : Bump patch version
+  minor : Bump minor version
+  major : Bump major version
+
+Options:
+  -m, --message : Version memo
+  -h, --help    : Show this help`
+	fmt.Println(help)
+}
+
 // Main
 func main() {
 	var newVersion Version
@@ -82,7 +98,15 @@ func main() {
 		}
 	}()
 
-	ctx := args.New().Alias("message", "m", "").Parse(os.Args[1:])
+	ctx := args.New().
+		Alias("message", "m", "").
+		Alias("help", "h", nil).
+		Parse(os.Args[1:])
+
+	if ctx.Has("help") {
+		showUsage()
+		os.Exit(0)
+	}
 
 	switch ctx.At(0) {
 	case "version":
