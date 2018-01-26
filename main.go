@@ -114,8 +114,6 @@ func main() {
 		if err = writeVersion(newVersion); err == nil {
 			fmt.Println(newVersion.VersionString())
 		}
-		writeVersion(newVersion)
-		fmt.Println(newVersion.VersionString())
 	case "major":
 		if err = setup(); err != nil {
 			return
@@ -134,18 +132,18 @@ func main() {
 
 // Write new version
 func writeVersion(newVersion Version) error {
-	if err := git(newVersion); err != nil {
-		return err
-	}
 	versions := Versions{newVersion}
 	versions = append(versions, vs...)
 	fp, _ := os.OpenFile(versionFile, os.O_RDWR, 0755)
-	defer fp.Close()
 	for i, v := range versions {
 		fp.WriteString(v.String())
 		if i != len(versions)-1 {
 			fp.WriteString("----\n\n")
 		}
+	}
+	fp.Close()
+	if err := git(newVersion); err != nil {
+		return err
 	}
 	return nil
 }
