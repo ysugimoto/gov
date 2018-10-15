@@ -60,7 +60,7 @@ $ gov major
 After that, you can push to remote with new commit and tag:
 
 ```
-$ git push --folow-tags
+$ git push --follow-tags
 ```
 
 ## Author
