@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	go build -ldflags "-X main.appVersion=$(shell gov)"
+	GO111MODULE=on go build -ldflags "-X main.appVersion=$(shell gov)"

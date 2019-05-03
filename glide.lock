@@ -1,6 +1,0 @@
-hash: febc8e484bccf4c5751ab99f15faf6287626fd717e5cac8c2bcf4314dc0de2ea
-updated: 2018-01-11T14:08:47.804993116+09:00
-imports:
-- name: github.com/ysugimoto/go-args
-  version: 95e6aae54c31c3d7a5ce7996f871a6776320e40d
-testImports: []

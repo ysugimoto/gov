@@ -1,3 +1,0 @@
-package: gituhb.com/ysugimoto/gov
-import:
-- package: github.com/ysugimoto/go-args
